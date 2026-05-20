@@ -5,6 +5,8 @@ import java.util.Scanner;
 
 public class MainTugas2 {
 
+    static Scanner input = new Scanner(System.in);
+
     // Array seluruh menu restoran
     static Menu[] daftarMenu = {
         new Menu(1, "Nasi Goreng", 15000, TipeMenu.MAKANAN),
@@ -18,11 +20,7 @@ public class MainTugas2 {
     };
 
     public static void main(String[] args) {
-        Scanner input = new Scanner(System.in);
-
-        // kita akan tampilkan menu terus sampai tidak memilih kembali
         mainMenu();
-
     }
 
     // ─── Tampilkan daftar menu ─────────────────────────────────────────────────
@@ -42,7 +40,7 @@ public class MainTugas2 {
             System.out.printf("%-4s %-18s %-10s %8s%n", (i + 1), m.getNama(), m.getKategori(), "Rp " + rupiah(m.getHarga()));
         }
 
-        System.out.println("--------------------------------------------");
+        System.out.println("--------------------------------------------\n");
 
         if (cred.equalsIgnoreCase("admin")) {
             return -1; // return -1 untuk admin agar bisa masuk ke menu admin
@@ -63,13 +61,13 @@ public class MainTugas2 {
     }
 
     //hitung total makanan 
-    static int hitungTotal(int[] nomorMenu, int[] qty) {
-        int subtotal = 0;
+    static long hitungTotal(List<Integer> nomorMenu, List<Integer> qty) {
+        long subtotal = 0;
 
-        for (int i = 0; i < nomorMenu.length; i++) {
-            Menu m = getMenu(nomorMenu[i]);
+        for (int i = 0; i < nomorMenu.size(); i++) {
+            Menu m = getMenu(nomorMenu.get(i));
             if (m != null) {
-                subtotal += m.getHarga() * qty[i];
+                subtotal += m.getHarga() * qty.get(i);
             }
         }
 
@@ -77,13 +75,13 @@ public class MainTugas2 {
     }
 
     // menghitung total harga minuman
-    static int hitungTotalMinuman(int[] nomorMenu, int[] qty, int jumlahItem) {
-        int totalMinuman = 0;
+    static long hitungTotalMinuman(List<Integer> nomorMenu, List<Integer> qty, int jumlahItem) {
+        long totalMinuman = 0;
 
         for (int i = 0; i < jumlahItem; i++) {
-            Menu m = getMenu(nomorMenu[i]);
+            Menu m = getMenu(nomorMenu.get(i));
             if (m != null && m.getKategori() == TipeMenu.MINUMAN) {
-                totalMinuman += m.getHarga() * qty[i];
+                totalMinuman += m.getHarga() * qty.get(i);
             }
         }
 
@@ -103,54 +101,42 @@ public class MainTugas2 {
     }
 
     // mencetak struk
-    static void cetakStruk(int[] nomorMenu, int[] qty, long subtotal) {
+    static void cetakStruk(List<Integer> nomorMenu, List<Integer> qty, long subtotal) {
         System.out.println("\n============================================");
         System.out.println("              STRUK PESANAN                 ");
         System.out.println("============================================");
         System.out.printf("%-18s %5s  %10s  %10s%n", "Item", "Qty", "Harga/pcs", "Total");
         System.out.println("--------------------------------------------");
 
-        for (int i = 0; i < nomorMenu.length; i++) {
-            cetakBarisPesanan(nomorMenu[i], qty[i]);
+        for (int i = 0; i < nomorMenu.size(); i++) {
+            cetakBarisPesanan(nomorMenu.get(i), qty.get(i));
         }
 
-        // if (jumlahItem >= 1) {
-        //     cetakBarisPesanan(nomorMenu[0], qty[0]);
-        // }
-        // if (jumlahItem >= 2) {
-        //     cetakBarisPesanan(nomorMenu[1], qty[1]);
-        // }
-        // if (jumlahItem >= 3) {
-        //     cetakBarisPesanan(nomorMenu[2], qty[2]);
-        // }
-        // if (jumlahItem >= 4) {
-        //     cetakBarisPesanan(nomorMenu[3], qty[3]);
-        // }
         System.out.println("--------------------------------------------");
         System.out.printf("%-30s %12s%n", "Subtotal:", "Rp " + rupiah(subtotal));
 
         // skenario: diskon 10% jika subtotal > Rp100.000
-        int diskon = 0;
+        long diskon = 0;
         if (subtotal > 100000) {
-            diskon = (int) (0.10 * subtotal);
+            diskon = (long) (0.10 * subtotal);
             System.out.printf("%-30s %12s%n", "Diskon 10% (> Rp100.000):", "-Rp " + rupiah(diskon));
         }
 
         // skenario: Promo Beli 1 Gratis 1 minuman jika subtotal > Rp50.000
-        int bonusMinuman = 0;
+        long bonusMinuman = 0;
         if (subtotal > 50000) {
-            bonusMinuman = hitungTotalMinuman(nomorMenu, qty, nomorMenu.length);
+            bonusMinuman = hitungTotalMinuman(nomorMenu, qty, nomorMenu.size());
             if (bonusMinuman > 0) {
                 System.out.printf("%-30s %12s%n", "Promo Minuman (> Rp50.000):", "-Rp " + rupiah(bonusMinuman));
             }
         }
 
         //pajak 10%
-        int pajak = (int) (0.10 * subtotal);
+        long pajak = (long) (0.10 * subtotal);
         System.out.printf("%-30s %12s%n", "Pajak (10% dari subtotal):", "+Rp " + rupiah(pajak));
 
         // skenario: biaya pelayanan
-        int service = 20000;
+        long service = 20000;
         System.out.printf("%-30s %12s%n", "Biaya Pelayanan:", "+Rp " + rupiah(service));
 
         long totalBayar = subtotal - diskon - bonusMinuman + pajak + service;
@@ -167,7 +153,7 @@ public class MainTugas2 {
         }
 
         System.out.println("\n     Terima kasih atas kunjungan Anda!    ");
-        System.out.println("============================================");
+        System.out.println("============================================\n");
     }
 
     // format angka ke rupiah
@@ -175,29 +161,7 @@ public class MainTugas2 {
         return String.format(java.util.Locale.US, "%,d", amount).replace(",", ".");
     }
 
-    static int menuPelanggan() {
-        Scanner input = new Scanner(System.in);
-
-        boolean valid = false;
-        while (!valid) {
-            int menu = tampilkanMenu("pelanggan");
-            System.out.print("Pilih nomor menu. Ketik 's' untuk berhenti memesan: ");
-            int pilihan = input.nextInt();
-
-            if (pilihan < 1 || pilihan > daftarMenu.length) {
-                System.out.println("Pilihan tidak valid. Silakan coba lagi.");
-            } else {
-                valid = true;
-                kelolaPesanan();
-
-            }
-        }
-
-        return 0;
-    }
-
     static void kelolaPesanan() {
-        Scanner input = new Scanner(System.in);
         List<Integer> nomorMenu = new ArrayList<>();
         List<Integer> qty = new ArrayList<>();
 
@@ -208,70 +172,64 @@ public class MainTugas2 {
             String pilihan = input.nextLine().trim();
 
             // Berhenti jika user ketik 's'
-            if (pilihan.equalsIgnoreCase("s")) {
+            if (pilihan.equalsIgnoreCase("s") || pilihan.equalsIgnoreCase("stop") || pilihan.equalsIgnoreCase("selesai")) {
                 break;
+            } else {
+
+                // Validasi apakah input adalah angka
+                if (!pilihan.matches("\\d+")) {
+                    System.out.println("Input tidak valid! Masukkan nomor menu.");
+                    continue;
+                }
+
+                int nomorPilihan = Integer.parseInt(pilihan);
+
+                // Validasi range nomor menu
+                if (nomorPilihan < 1 || nomorPilihan > daftarMenu.length) {
+                    System.out.println("Nomor menu tidak tersedia. Silakan coba lagi.");
+                    continue;
+                }
+
+                // Input jumlah
+                System.out.print("Jumlah: ");
+                String inputJumlah = input.nextLine().trim();
+
+                if (!inputJumlah.matches("\\d+") || Integer.parseInt(inputJumlah) < 1) {
+                    System.out.println("Jumlah tidak valid!");
+                    continue;
+                }
+
+                int jumlah = Integer.parseInt(inputJumlah);
+
+                // Simpan pesanan
+                nomorMenu.add(nomorPilihan);
+                qty.add(jumlah);
+                System.out.println("\nPesanan ditambahkan!\n");
             }
-
-            // Validasi apakah input adalah angka
-            if (!pilihan.matches("\\d+")) {
-                System.out.println("Input tidak valid! Masukkan nomor menu.");
-                continue;
-            }
-
-            int nomorPilihan = Integer.parseInt(pilihan);
-
-            // Validasi range nomor menu
-            if (nomorPilihan < 1 || nomorPilihan > daftarMenu.length) {
-                System.out.println("Nomor menu tidak tersedia. Silakan coba lagi.");
-                continue;
-            }
-
-            // Input jumlah
-            System.out.print("Jumlah: ");
-            String inputJumlah = input.nextLine().trim();
-
-            if (!inputJumlah.matches("\\d+") || Integer.parseInt(inputJumlah) < 1) {
-                System.out.println("Jumlah tidak valid!");
-                continue;
-            }
-
-            int jumlah = Integer.parseInt(inputJumlah);
-
-            // Simpan pesanan
-            nomorMenu.add(nomorPilihan);
-            qty.add(jumlah);
-            System.out.println("Pesanan ditambahkan!");
 
             // Konfirmasi tambah pesanan
-            if (!cekKonfirmasi("Tambah pesanan lagi?")) {
-                break;
+            if (!cekKonfirmasi("Tambah pesanan lagi ")) {
+                break; // keluar dari metode kelolaPesanan
             }
         }
 
-        input.close();
-
-        // if (jumlahItem == 0) {
-        //     System.out.println("\nTidak ada pesanan. Sampai jumpa!");
-        //     return;
-        // }
-        int subtotal = hitungTotal(nomorMenu, qty, nomorMenu.length);
+        long subtotal = hitungTotal(nomorMenu, qty);
         cetakStruk(nomorMenu, qty, subtotal);
     }
 
     static void tambahMenu() {
-
-        Scanner input = new Scanner(System.in);
+        input.nextLine(); // bersihkan buffer sebelumnya
 
         System.out.print("Nama menu: ");
         String namaMenu = input.nextLine().trim();
 
         System.out.print("Harga: ");
         int harga = input.nextInt();
-
+        input.nextLine(); // membersihkan newline yang tersisa
         System.out.print("Kategori (Makanan/Minuman): ");
         String kategori = input.next().trim();
 
-// tambahkan menu pada array daftarMenu
+        // tambahkan menu pada array daftarMenu
         Menu menuBaru = new Menu(
                 daftarMenu.length + 1,
                 namaMenu,
@@ -282,7 +240,7 @@ public class MainTugas2 {
         // buat array baru ukuran +1
         Menu[] daftarBaru = new Menu[daftarMenu.length + 1];
 
-// copy data lama
+        // copy data lama
         for (int i = 0; i < daftarMenu.length; i++) {
             daftarBaru[i] = daftarMenu[i];
         }
@@ -293,14 +251,13 @@ public class MainTugas2 {
 // timpa array lama
         daftarMenu = daftarBaru;
 
-        System.out.println("Menu berhasil ditambahkan!");
+        System.out.println("Menu berhasil ditambahkan!\n");
     }
 
     static void editMenu() {
 // tampilkan menu yang ada
         tampilkanMenu("admin");
 // minta input nomor menu yang ingin diedit
-        Scanner input = new Scanner(System.in);
         System.out.print("Masukkan nomor menu yang ingin diedit/'0' untuk kembali: ");
         int noMenu = input.nextInt();
         if (noMenu == 0) {
@@ -318,26 +275,26 @@ public class MainTugas2 {
         } else {
             if (menu.getId() == noMenu) {
 // kita akan melakukan perubahan pada data ini
+                System.out.println("Nama menu untuk di edit: " + menu.getNama());
                 System.out.print("Harga[" + menu.getHarga() + "]: ");
-                String hargaBaru = input.next().trim(); // ✅ tidak ada sisa '\n'
+                String hargaBaru = input.next().trim();
 
+                input.nextLine(); //bersihkan newline
                 String pesanKonfirmasi = "Apakah Anda yakin ingin mengubah harga menu ini";
 
                 if (cekKonfirmasi(pesanKonfirmasi)) {
                     if (!hargaBaru.isEmpty()) {
                         menu.setHarga(Long.parseLong(hargaBaru));
                     }
-                    System.out.println("Menu berhasil diedit!");
+                    System.out.println("Menu berhasil diedit!\n");
                 } else {
-                    System.out.println("Perubahan dibatalkan.");
+                    System.out.println("Perubahan dibatalkan.\n");
                 }
             }
         }
     }
 
     static boolean cekKonfirmasi(String pesan) {
-        Scanner input = new Scanner(System.in);
-
         List<String> ya = List.of("y", "ya", "yes");
         List<String> tidak = List.of("t", "tidak", "no");
 
@@ -360,9 +317,9 @@ public class MainTugas2 {
         // tampilkan menu yang ada
         tampilkanMenu("admin");
 // minta input nomor menu yang ingin dihapus
-        Scanner input = new Scanner(System.in);
         System.out.print("Masukkan nomor menu yang ingin dihapus/'0' untuk kembali: ");
         int noMenu = input.nextInt();
+        input.nextLine();
         if (noMenu == 0) {
             return; // kembali ke menu admin
         } else if (noMenu < 1 || noMenu > daftarMenu.length) {
@@ -392,17 +349,15 @@ public class MainTugas2 {
                     }
 
                     daftarMenu = daftarBaru;
-                    System.out.println("Menu berhasil dihapus!");
+                    System.out.println("Menu berhasil dihapus!\n");
                 } else {
-                    System.out.println("Penghapusan dibatalkan.");
+                    System.out.println("Penghapusan dibatalkan.\n");
                 }
             }
         }
     }
 
     static int tampilkanMenuAdmin() {
-        Scanner input = new Scanner(System.in);
-
         System.out.println("============================================");
         System.out.println("         SELAMAT DATANG ADMIN       ");
         System.out.println("============================================");
@@ -432,32 +387,37 @@ public class MainTugas2 {
         while (!valid) {
             // menu admin
             int menu = tampilkanMenuAdmin();
-
-            if (menu == 1) {
-                // tambah menu di sini
-                tambahMenu();
-            } else if (menu == 2) {
-                // edit menu di sini
-                editMenu();
-            } else if (menu == 3) {
-                // hapus menu di sini
-                hapusMenu();
-            } else if (menu == 4) {
-                tampilkanMenu("admin");
-            } else if (menu == 5) {
-                valid = true;
-                mainMenu();
-            } else if (menu == 0) {
-                System.out.println("Pilihan tidak valid. Silakan coba lagi: ");
+            switch (menu) {
+                case 1:
+                    // tambah menu di sini
+                    tambahMenu();
+                    break;
+                case 2:
+                    // edit menu di sini
+                    editMenu();
+                    break;
+                case 3:
+                    // hapus menu di sini
+                    hapusMenu();
+                    break;
+                case 4:
+                    tampilkanMenu("admin");
+                    break;
+                case 5:
+                    valid = true;
+                    break;
+                case 0:
+                    System.out.println("Pilihan tidak valid. Silakan coba lagi: ");
+                    break;
+                default:
+                    break;
             }
         }
     }
 
     static int tampilkanMenuUtama() {
         // ini adalah menu yang handle kedua menu utama, pelanggan dan admin
-        Scanner input = new Scanner(System.in);
-
-        System.out.println("============================================");
+        System.out.println("\n============================================");
         System.out.println("         SELAMAT DATANG DI UMAH RASA       ");
         System.out.println("============================================");
         System.out.println("1. Menu Pelanggan");
@@ -480,20 +440,24 @@ public class MainTugas2 {
     static void mainMenu() {
         // ini adalah method yang handle menu utama, pelanggan dan admin
         boolean valid = false;
-        while (valid == false) {
+        while (!valid) {
             int menu = tampilkanMenuUtama();
-            if (menu == 0) {
-                System.out.println("Pilihan tidak valid. Silakan coba lagi.");
-            } else if (menu == 1) {
-                // menu pelanggan
-                menuPelanggan();
-            } else if (menu == 2) {
-                // menu admin
-                menuAdmin();
-            } else {
-                valid = true;
-                System.out.println("Terima kasih! Sampai jumpa!");
-                System.exit(0);
+            switch (menu) {
+                case 0:
+                    System.out.println("Pilihan tidak valid. Silakan coba lagi.");
+                    break;
+                case 1:
+                    // menu pelanggan
+                    kelolaPesanan();
+                    break;
+                case 2:
+                    // menu admin
+                    menuAdmin();
+                    break;
+                default:
+                    valid = true;
+                    System.out.println("Terima kasih! Sampai jumpa!");
+                    System.exit(0);
             }
         }
     }
