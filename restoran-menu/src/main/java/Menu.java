@@ -3,10 +3,10 @@ public class Menu {
 
     private int id;
     private String nama;
-    private int harga;
-    private String kategori;
+    private long harga;
+    private TipeMenu kategori;
 
-    public Menu(int id, String nama, int harga, String kategori) {
+    public Menu(int id, String nama, long harga, TipeMenu kategori) {
         this.id = id;
         this.nama = nama;
         this.harga = harga;
@@ -21,12 +21,28 @@ public class Menu {
         return nama;
     }
 
-    public int getHarga() {
+    public long getHarga() {
         return harga;
     }
 
-    public String getKategori() {
+    public TipeMenu getKategori() {
         return kategori;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setNama(String nama) {
+        this.nama = nama;
+    }
+
+    public void setHarga(long harga) {
+        this.harga = harga;
+    }
+
+    public void setKategori(TipeMenu kategori) {
+        this.kategori = kategori;
     }
 
 }
